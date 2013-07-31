@@ -225,14 +225,15 @@ module CarrierWave
         #
         # [Boolean] true on success or raises error
         def store(new_file)
-          fog_file = new_file.to_file
+          fog_file = new_file.to_file if new_file.respond_to?(:to_file)
           @content_type ||= new_file.content_type
-          @file = directory.files.create({
-            :body         => fog_file ? fog_file : new_file.read,
-            :content_type => @content_type,
-            :key          => path,
-            :public       => @uploader.fog_public
-          }.merge(@uploader.fog_attributes))
+          @file = directory.files.create(
+            {
+              :body         => fog_file ? fog_file : new_file.read,
+              :content_type => @content_type,
+              :key          => path,
+              :public       => @uploader.fog_public
+            }.merge(@uploader.fog_attributes))
           true
         end
 
